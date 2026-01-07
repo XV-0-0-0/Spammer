@@ -1,41 +1,40 @@
-import aiohttp
+from telethon import TelegramClient
 import asyncio
-import time
 
-URL = "URL"
+api_id =
+api_hash = ''
 
-REQUESTS = 100 #all
-CONCURRENCY = 100 #same time
+friend_username = ''
+message_text = ""
 
-information = {
-    "name": "Test",
-    "userName": "Vlad",
-    "userLocation": "Poland"
-}
+REQUESTS = 3
+CONCURRENCY = 1
 
-async def worker(session, i, results):
-    start = time.time()
+YOUR_PASSWORD = ''
+
+
+async def worker(client, i):
     try:
-        async with session.post(URL, json=information) as resp:
-            latency = round((time.time() - start) * 1000)
-            results.append(latency)
-            print(f"{i}: Status {resp.status} | {latency} ms")
+        await client.send_message(friend_username, message_text)
+        print(f"Message {i}: Successfully sent")
     except Exception as e:
-        print(f"{i}: ERROR {e}")
+        print(f"Message {i}: Error: {e}")
+
 
 async def run_test():
-    results = []
 
-    conn = aiohttp.TCPConnector(limit=CONCURRENCY)
-    async with aiohttp.ClientSession(connector=conn) as session:
-        tasks = [worker(session, i, results) for i in range(REQUESTS)]
-        await asyncio.gather(*tasks)
+    client = TelegramClient('my_birthday_session', api_id, api_hash)
 
-    print("\n---- RESULTS ----")
-    print(f"Total requests: {len(results)}")
-    print(f"Average latency: {sum(results)/len(results):.2f} ms")
-    print(f"Fastest: {min(results)} ms")
-    print(f"Slowest: {max(results)} ms")
+    await client.start(password=YOUR_PASSWORD)
 
-if __name__ == "__main__":
+    print("Authorisation successful! Starting to send...")
+
+    tasks = [worker(client, i) for i in range(REQUESTS)]
+    await asyncio.gather(*tasks)
+
+    print("\n---- DONE ----")
+    await client.disconnect()
+
+
+if __name__ == '__main__':
     asyncio.run(run_test())
