@@ -10,7 +10,7 @@ message_text = ""
 
 REQUESTS = 500
 
-YOUR_PASSWORD = '1234567890qwe@#*'
+YOUR_PASSWORD = ''
 
 async def run_test():
     client = TelegramClient('my_birthday_session', api_id, api_hash)
